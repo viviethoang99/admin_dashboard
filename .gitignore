@@ -44,4 +44,5 @@ app.*.map.json
 
 # Genaerated files
 *.g.dart
+# *.freezed.dart
 .env
