@@ -1,11 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:irohasu_admin/feature/dashboard/screen/dashboard_screen.dart';
 import 'package:irohasu_admin/feature/login/screen/login_page.dart';
 import 'package:irohasu_admin/feature/posts/screens/post_detail_screen.dart';
 import 'package:irohasu_admin/services/auth_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../feature/posts/screens/list_post_tab.dart';
 
 part 'routes.g.dart';
 
@@ -18,15 +18,32 @@ GoRouter router(RouterRef ref) {
     ..listen(currentAuthStateProvider, (_, state) => authStateNotifier.value = state);
 
   final navigationItems = [
-    GoRoute(path: '/dashboard', builder: (_, __) => const DashboardScreen(), routes: [
-      GoRoute(
-        path: ':id',
-        builder: (_, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return PostDetailScreen(id);
-        },
-      ),
-    ]),
+    GoRoute(
+      path: '/posts',
+      builder: (_, __) => const ListPostTab(),
+      routes: [
+        GoRoute(
+          path: 'create',
+          builder: (_, __) => Container(),
+        ),
+        GoRoute(
+          path: ':id',
+          builder: (_, state) {
+            final id = state.pathParameters['id'] ?? '';
+            return PostDetailScreen(id);
+          },
+          routes: [
+            GoRoute(
+              path: 'update',
+              builder: (_, state) {
+                final id = state.pathParameters['id'] ?? '';
+                return PostDetailScreen(id);
+              },
+            ),
+          ],
+        ),
+      ],
+    ),
   ];
 
   final router = GoRouter(

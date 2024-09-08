@@ -51,6 +51,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
+        themeMode: ThemeMode.dark,
         routerConfig: router,
       ),
     );

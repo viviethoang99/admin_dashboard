@@ -9,13 +9,14 @@ import '../../feature/posts/models/post_model.dart';
 
 part 'api_client.g.dart';
 
-@RestApi(baseUrl: Env.domain)
+@RestApi()
 abstract class ApiClient {
   factory ApiClient(Dio dio) {
     return _ApiClient(dio);
   }
 
   factory ApiClient.create() => ApiClient(Dio()
+    ..options = BaseOptions(baseUrl: Env.domain)
     ..interceptors.addAll([
       PrettyDioLogger(
         requestHeader: true,

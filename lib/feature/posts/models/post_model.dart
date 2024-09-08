@@ -3,7 +3,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'post_model.freezed.dart';
 part 'post_model.g.dart';
 
-@freezed
+@Freezed(
+  copyWith: true,
+  equal: true,
+)
 class PostModel with _$PostModel {
   const factory PostModel({
     String? id,

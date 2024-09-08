@@ -21,8 +21,8 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
   final controller = TextEditingController();
   final editorStyle = EditorStyle.desktop(
     padding: const EdgeInsets.symmetric(horizontal: 16),
-    cursorColor: Colors.transparent,
-    cursorWidth: 0,
+    cursorColor: Colors.red,
+    cursorWidth: 2,
     selectionColor: Colors.grey.withOpacity(0.3),
     textStyleConfiguration: const TextStyleConfiguration(
       lineHeight: 1.2,
@@ -32,16 +32,15 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
         fontSize: 16,
         color: Colors.black,
       ),
-      // code: GoogleFonts.architectsDaughter(),
-      // bold: GoogleFonts.poppins(
-      //   fontWeight: FontWeight.w500,
-      // ),
     ),
   );
 
   @override
   void initState() {
     super.initState();
+    editorState = EditorState(
+      document: markdownToDocument(widget.content),
+    );
     controller.text = widget.content;
     controller.addListener(_onTextChanged);
   }
@@ -54,44 +53,14 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text('Markdown Editor'),
-        titleTextStyle: const TextStyle(color: Colors.white),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
-      ),
-      body: Row(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Expanded(
-            child: AppFlowyEditor(
-              editorState: editorState,
-              editorStyle: editorStyle,
-              editable: false,
-              blockComponentBuilders: {
-                ...standardBlockComponentBuilderMap,
-                CodeBlockKeys.type: CodeBlockComponentBuilder(),
-              },
-            ),
-          ),
-          const VerticalDivider(),
-          Expanded(
-            child: TextFormField(
-              controller: controller,
-              maxLines: null,
-              decoration: const InputDecoration(
-                hintText: 'Type markdown here ...',
-                border: InputBorder.none,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return AppFlowyEditor(
+      editorState: editorState,
+      editorStyle: editorStyle,
+      editable: true,
+      blockComponentBuilders: {
+        ...standardBlockComponentBuilderMap,
+        CodeBlockKeys.type: CodeBlockComponentBuilder(),
+      },
     );
   }
 

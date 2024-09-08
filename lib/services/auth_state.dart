@@ -50,12 +50,10 @@ enum AuthState {
     ],
   ),
   authenticated(
-    redirectPath: '/dashboard',
+    redirectPath: '/posts',
     allowedPaths: [
-      '/dashboard',
-      '/dashboard/:id',
-      '/products',
-      '/products/:id',
+      '/posts',
+      '/posts/:id',
       '/todos',
       '/todos/add',
       '/todos/:id',

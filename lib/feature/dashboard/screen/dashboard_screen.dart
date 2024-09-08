@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../services/routes.dart';
@@ -24,7 +25,7 @@ class DashboardScreen extends HookConsumerWidget {
               return Card(
                 child: ListTile(
                   onTap: () {
-                    ref.read(routerProvider).go('/dashboard/${article.id}');
+                    context.go('/dashboard/${article.id}');
                   },
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
