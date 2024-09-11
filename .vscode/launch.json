@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "irohasu_admin",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "irohasu_admin (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "irohasu_admin (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "irh_editor",
+            "cwd": "packages/irh_editor",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "irh_editor (profile mode)",
+            "cwd": "packages/irh_editor",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "irh_editor (release mode)",
+            "cwd": "packages/irh_editor",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

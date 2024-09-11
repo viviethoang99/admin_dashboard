@@ -44,15 +44,17 @@ final CharacterShortcutEvent enterInCodeBlock = CharacterShortcutEvent(
 ///   - web
 ///   - mobile
 ///
-final List<CharacterShortcutEvent> ignoreKeysInCodeBlock = [' ', '/', '_', '*', '~', '-']
-    .map(
-      (e) => CharacterShortcutEvent(
-        key: 'ignore keys in code block',
-        character: e,
-        handler: (editorState) => _ignoreKeysInCodeBlockCommandHandler(editorState, e),
-      ),
-    )
-    .toList();
+final List<CharacterShortcutEvent> ignoreKeysInCodeBlock =
+    [' ', '/', '_', '*', '~', '-']
+        .map(
+          (e) => CharacterShortcutEvent(
+            key: 'ignore keys in code block',
+            character: e,
+            handler: (editorState) =>
+                _ignoreKeysInCodeBlockCommandHandler(editorState, e),
+          ),
+        )
+        .toList();
 
 /// Shift+enter to insert a new node next to the code block.
 ///
@@ -75,11 +77,13 @@ CommandShortcutEvent insertNewParagraphNextToCodeBlockCommand(
 /// - support
 ///   - desktop
 ///   - web
-CommandShortcutEvent tabSpacesAtCurosrInCodeBlockCommand(String description) => CommandShortcutEvent(
+CommandShortcutEvent tabSpacesAtCurosrInCodeBlockCommand(String description) =>
+    CommandShortcutEvent(
       key: 'tab to insert two spaces at the cursor in code block',
       command: 'tab',
       getDescription: () => description,
-      handler: (editorState) => _addTwoSpacesInCodeBlockCommandHandler(editorState),
+      handler: (editorState) =>
+          _addTwoSpacesInCodeBlockCommandHandler(editorState),
     );
 
 /// Tab to insert two spaces at the line start in code block,
@@ -88,7 +92,8 @@ CommandShortcutEvent tabSpacesAtCurosrInCodeBlockCommand(String description) => 
 /// - support
 ///   - desktop
 ///   - web
-CommandShortcutEvent tabToInsertSpacesInCodeBlockCommand(String description) => CommandShortcutEvent(
+CommandShortcutEvent tabToInsertSpacesInCodeBlockCommand(String description) =>
+    CommandShortcutEvent(
       key: 'tab to insert two spaces at the line start in code block',
       command: 'tab',
       getDescription: () => description,
@@ -148,7 +153,8 @@ CommandShortcutEvent pasteInCodeblock(
       handler: _pasteInCodeBlock,
     );
 
-CharacterShortcutEventHandler _enterInCodeBlockCommandHandler = (editorState) async {
+CharacterShortcutEventHandler _enterInCodeBlockCommandHandler =
+    (editorState) async {
   final selection = editorState.selection;
   if (selection == null || !selection.isCollapsed) {
     return false;
@@ -163,7 +169,8 @@ CharacterShortcutEventHandler _enterInCodeBlockCommandHandler = (editorState) as
   if (lines?.isNotEmpty == true) {
     int index = 0;
     for (final line in lines!) {
-      if (index <= selection.endIndex && selection.endIndex <= index + line.length) {
+      if (index <= selection.endIndex &&
+          selection.endIndex <= index + line.length) {
         final lineSpaces = line.length - line.trimLeft().length;
         spaces = lineSpaces;
         break;
@@ -198,7 +205,8 @@ Future<bool> _ignoreKeysInCodeBlockCommandHandler(
   return true;
 }
 
-CommandShortcutEventHandler _insertNewParagraphNextToCodeBlockCommandHandler = (editorState) {
+CommandShortcutEventHandler _insertNewParagraphNextToCodeBlockCommandHandler =
+    (editorState) {
   final selection = editorState.selection;
   if (selection == null || !selection.isCollapsed) {
     return KeyEventResult.ignored;
@@ -242,7 +250,8 @@ KeyEventResult _addTwoSpacesInCodeBlockCommandHandler(
     return KeyEventResult.ignored;
   }
 
-  final transaction = editorState.transaction..insertText(node, selection.end.offset, '  ');
+  final transaction = editorState.transaction
+    ..insertText(node, selection.end.offset, '  ');
 
   editorState.apply(transaction);
 
@@ -276,7 +285,8 @@ KeyEventResult _indentationInCodeBlockCommandHandler(
     if (!shouldIndent && line.startsWith(spaces) || shouldIndent) {
       bool shouldTransform = false;
 
-      shouldTransform = index + line.length >= selection.startIndex && selection.endIndex >= index;
+      shouldTransform = index + line.length >= selection.startIndex &&
+          selection.endIndex >= index;
 
       if (shouldIndent && line.trim().isEmpty) {
         shouldTransform = false;
@@ -301,7 +311,9 @@ KeyEventResult _indentationInCodeBlockCommandHandler(
   final transaction = editorState.transaction;
 
   for (final index in transactions.reversed) {
-    shouldIndent ? transaction.insertText(node, index, spaces) : transaction.deleteText(node, index, spaces.length);
+    shouldIndent
+        ? transaction.insertText(node, index, spaces)
+        : transaction.deleteText(node, index, spaces.length);
   }
 
   // In case the selection is made backwards, we store the start
@@ -315,10 +327,13 @@ KeyEventResult _indentationInCodeBlockCommandHandler(
 
   final endSelection = end.copyWith(offset: endOffset);
 
-  final startOffset =
-      shouldIndent ? start.offset + spaces.length : start.offset - (selectionStartsAtLineStart ? 0 : spaces.length);
+  final startOffset = shouldIndent
+      ? start.offset + spaces.length
+      : start.offset - (selectionStartsAtLineStart ? 0 : spaces.length);
 
-  final startSelection = selection.isCollapsed ? endSelection : start.copyWith(offset: startOffset);
+  final startSelection = selection.isCollapsed
+      ? endSelection
+      : start.copyWith(offset: startOffset);
 
   transaction.afterSelection = selection.copyWith(
     start: selection.isBackward ? startSelection : endSelection,
@@ -330,7 +345,8 @@ KeyEventResult _indentationInCodeBlockCommandHandler(
   return KeyEventResult.handled;
 }
 
-CommandShortcutEventHandler _selectAllInCodeBlockCommandHandler = (editorState) {
+CommandShortcutEventHandler _selectAllInCodeBlockCommandHandler =
+    (editorState) {
   final selection = editorState.selection;
   if (selection == null || !selection.isSingle) {
     return KeyEventResult.ignored;
@@ -384,7 +400,8 @@ CommandShortcutEventHandler _pasteInCodeBlock = (editorState) {
     final data = await AppFlowyClipboard.getData();
     final text = data.text;
     if (text != null && text.isNotEmpty) {
-      final transaction = editorState.transaction..insertText(node, selection!.end.offset, text);
+      final transaction = editorState.transaction
+        ..insertText(node, selection!.end.offset, text);
 
       await editorState.apply(transaction);
     }

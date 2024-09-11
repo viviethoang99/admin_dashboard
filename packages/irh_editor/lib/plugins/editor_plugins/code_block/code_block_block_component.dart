@@ -3,69 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:appflowy_editor/appflowy_editor.dart';
-
-import 'package:highlight/highlight.dart' as highlight;
-import 'package:highlight/languages/all.dart';
 import 'package:provider/provider.dart';
+import 'package:syntax_highlight/syntax_highlight.dart';
 
+import '../../../shared/spacing.dart';
 import 'code_block_actions.dart';
 import 'code_block_localization.dart';
 import 'code_block_style.dart';
-import 'code_block_themes.dart';
-
-final allCodeBlockLanguages = [
-  'Assembly',
-  'Bash',
-  'BASIC',
-  'C',
-  'C#',
-  'CPP',
-  'Clojure',
-  'CS',
-  'CSS',
-  'Dart',
-  'Docker',
-  'Elixir',
-  'Elm',
-  'Erlang',
-  'Fortran',
-  'Go',
-  'GraphQL',
-  'Haskell',
-  'HTML',
-  'Java',
-  'JavaScript',
-  'JSON',
-  'Kotlin',
-  'LaTeX',
-  'Lisp',
-  'Lua',
-  'Markdown',
-  'MATLAB',
-  'Objective-C',
-  'OCaml',
-  'Perl',
-  'PHP',
-  'PowerShell',
-  'Python',
-  'R',
-  'Ruby',
-  'Rust',
-  'Scala',
-  'Shell',
-  'SQL',
-  'Swift',
-  'TypeScript',
-  'Visual Basic',
-  'XML',
-  'YAML',
-];
-
-final defaultCodeBlockSupportedLanguages =
-    allCodeBlockLanguages.map((e) => e.toLowerCase()).toSet().intersection(allLanguages.keys.toSet()).toList()
-      ..add('auto')
-      ..add('c')
-      ..sort();
 
 class CodeBlockKeys {
   const CodeBlockKeys._();
@@ -343,49 +287,21 @@ class _CodeBlockComponentWidgetState extends State<CodeBlockComponentWidget>
       onExit: (_) => setState(() => isHovering = false),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
           color: widget.style?.backgroundColor ?? Theme.of(context).colorScheme.secondaryContainer,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(100),
+              blurRadius: 8,
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           textDirection: textDirection,
           children: [
-            MouseRegion(
-              onEnter: (_) => setState(() => canPanStart = false),
-              onExit: (_) => setState(() => canPanStart = true),
-              child: Opacity(
-                opacity: isHovering || isSelected ? 1.0 : 0.0,
-                child: Row(
-                  children: [
-                    _LanguageSelector(
-                      editorState: editorState,
-                      language: language,
-                      isSelected: isSelected,
-                      onLanguageSelected: (language) {
-                        updateLanguage(language);
-                        widget.actions.onLanguageChanged?.call(language);
-                      },
-                      onMenuOpen: () => isSelected = true,
-                      onMenuClose: () => setState(() => isSelected = false),
-                      languagePickerBuilder: widget.languagePickerBuilder,
-                      localizations: widget.localizations,
-                    ),
-                    const Spacer(),
-                    if (widget.actions.onCopy != null && widget.copyButtonBuilder == null) ...[
-                      _CopyButton(
-                        node: node,
-                        onCopy: widget.actions.onCopy!,
-                        localizations: widget.localizations,
-                        foregroundColor: widget.style?.foregroundColor,
-                      ),
-                    ] else if (widget.copyButtonBuilder != null) ...[
-                      widget.copyButtonBuilder!(editorState, node),
-                    ],
-                  ],
-                ),
-              ),
-            ),
+            _buildAppbar(),
             _buildCodeBlock(context, textDirection),
           ],
         ),
@@ -418,26 +334,47 @@ class _CodeBlockComponentWidgetState extends State<CodeBlockComponentWidget>
     return child;
   }
 
+  Widget _buildAppbar() {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: Color(0xFF292b2f),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
+      child: Row(
+        children: [
+          const HSpace(16),
+          const _DotsWidget(),
+          const HSpace(4),
+          // IrohaText.medium(
+          //   language?.capitalize() ?? '',
+          //   fontSize: 16,
+          // ),
+          const Spacer(),
+          if (widget.actions.onCopy != null && widget.copyButtonBuilder == null) ...[
+            _CopyButton(
+              node: node,
+              onCopy: widget.actions.onCopy!,
+              localizations: widget.localizations,
+              foregroundColor: widget.style?.foregroundColor,
+            ),
+          ] else if (widget.copyButtonBuilder != null) ...[
+            widget.copyButtonBuilder!(editorState, node),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildCodeBlock(BuildContext context, TextDirection textDirection) {
-    final isLightMode = Theme.of(context).brightness == Brightness.light;
     final delta = node.delta ?? Delta();
     final content = delta.toPlainText();
 
-    final result = highlight.highlight.parse(
-      content,
-      language: language,
-      autoDetection: language == null,
-    );
-
-    autoDetectLanguage = language ?? result.language;
-
-    final codeNodes = result.nodes;
-    if (codeNodes == null) {
-      throw Exception('Code block parse error.');
-    }
-
-    final codeTextSpans = _convert(codeNodes, isLightMode: isLightMode);
     final linesOfCode = delta.toPlainText().split('\n').length;
+
+    final isLightMode = Theme.of(context).brightness == Brightness.light;
 
     return Padding(
       padding: widget.padding,
@@ -464,18 +401,32 @@ class _CodeBlockComponentWidgetState extends State<CodeBlockComponentWidget>
                   padding: const EdgeInsets.only(bottom: 16),
                   physics: const ClampingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
-                  child: AppFlowyRichText(
-                    key: forwardKey,
-                    delegate: this,
-                    node: widget.node,
-                    editorState: editorState,
-                    placeholderText: placeholderText,
-                    lineHeight: 1.5,
-                    textSpanDecorator: (_) => TextSpan(style: textStyle, children: codeTextSpans),
-                    placeholderTextSpanDecorator: (textSpan) => textSpan,
-                    textDirection: textDirection,
-                    cursorColor: editorState.editorStyle.cursorColor,
-                    selectionColor: editorState.editorStyle.selectionColor,
+                  child: FutureBuilder(
+                    future: isLightMode ? HighlighterTheme.loadLightTheme() : HighlighterTheme.loadDarkTheme(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) return const SizedBox.shrink();
+
+                      Highlighter highlighter = Highlighter(
+                        language: 'dart',
+                        theme: snapshot.data!,
+                      );
+
+                      final textSpanCode = highlighter.highlight(content).copyWith(style: textStyle);
+
+                      return AppFlowyRichText(
+                        key: forwardKey,
+                        delegate: this,
+                        node: widget.node,
+                        editorState: editorState,
+                        placeholderText: placeholderText,
+                        lineHeight: 1.5,
+                        textSpanDecorator: (_) => textSpanCode,
+                        placeholderTextSpanDecorator: (textSpan) => textSpan,
+                        textDirection: textDirection,
+                        cursorColor: editorState.editorStyle.cursorColor,
+                        selectionColor: editorState.editorStyle.selectionColor,
+                      );
+                    },
                   ),
                 ),
               ),
@@ -484,15 +435,6 @@ class _CodeBlockComponentWidgetState extends State<CodeBlockComponentWidget>
         ],
       ),
     );
-  }
-
-  Future<void> updateLanguage(String language) async {
-    final transaction = editorState.transaction
-      ..updateNode(
-        node,
-        {CodeBlockKeys.language: language == 'auto' ? null : language},
-      );
-    await editorState.apply(transaction);
   }
 
   void calculateScrollPosition() {
@@ -524,7 +466,9 @@ class _CodeBlockComponentWidgetState extends State<CodeBlockComponentWidget>
         // If the relative position of the cursor is less than 1, and the scrollController
         // is not at offset 0, then we need to scroll to the left to make cursor visible.
         if (cursorRelativeOffset.dx < 1 && scrollController.offset > 0) {
-          scrollController.jumpTo(scrollController.offset + cursorRelativeOffset.dx - 1);
+          scrollController.jumpTo(
+            scrollController.offset + cursorRelativeOffset.dx - 1,
+          );
 
           // If the relative position of the cursor is greater than the width of the code block,
           // then we need to scroll to the right to make cursor visible.
@@ -535,49 +479,6 @@ class _CodeBlockComponentWidgetState extends State<CodeBlockComponentWidget>
         }
       }
     });
-  }
-
-  // Copy from flutter.highlight package.
-  // https://github.com/git-touch/highlight.dart/blob/master/flutter_highlight/lib/flutter_highlight.dart
-  List<TextSpan> _convert(
-    List<highlight.Node> nodes, {
-    bool isLightMode = true,
-  }) {
-    final List<TextSpan> spans = [];
-    List<TextSpan> currentSpans = spans;
-    final List<List<TextSpan>> stack = [];
-
-    final cbTheme = isLightMode ? lightThemeInCodeblock : darkThemeInCodeBlock;
-
-    void traverse(highlight.Node node) {
-      if (node.value != null) {
-        currentSpans.add(
-          node.className == null
-              ? TextSpan(text: node.value)
-              : TextSpan(text: node.value, style: cbTheme[node.className!]),
-        );
-      } else if (node.children != null) {
-        final List<TextSpan> tmp = [];
-        currentSpans.add(
-          TextSpan(children: tmp, style: cbTheme[node.className!]),
-        );
-        stack.add(currentSpans);
-        currentSpans = tmp;
-
-        for (final n in node.children!) {
-          traverse(n);
-          if (n == node.children!.last) {
-            currentSpans = stack.isEmpty ? spans : stack.removeLast();
-          }
-        }
-      }
-    }
-
-    for (final node in nodes) {
-      traverse(node);
-    }
-
-    return spans;
   }
 }
 
@@ -641,115 +542,27 @@ class _CopyButton extends StatelessWidget {
   }
 }
 
-class _LanguageSelector extends StatefulWidget {
-  const _LanguageSelector({
-    required this.editorState,
-    this.language,
-    required this.isSelected,
-    required this.onLanguageSelected,
-    this.onMenuOpen,
-    this.onMenuClose,
-    this.languagePickerBuilder,
-    required this.localizations,
-  });
+const _listColorDots = [Color(0xFFCF625D), Color(0xFFfdbc40), Color(0xFF67e559)];
 
-  final EditorState editorState;
-  final String? language;
-  final bool isSelected;
-  final void Function(String) onLanguageSelected;
-  final VoidCallback? onMenuOpen;
-  final VoidCallback? onMenuClose;
-
-  final CodeBlockLanguagePickerBuilder? languagePickerBuilder;
-  final CodeBlockLocalizations localizations;
-
-  @override
-  State<_LanguageSelector> createState() => _LanguageSelectorState();
-}
-
-class _LanguageSelectorState extends State<_LanguageSelector> {
-  @override
-  Widget build(BuildContext context) {
-    if (widget.languagePickerBuilder != null) {
-      return widget.languagePickerBuilder!(
-        widget.editorState,
-        defaultCodeBlockSupportedLanguages,
-        widget.onLanguageSelected,
-        selectedLanguage: widget.language,
-        onMenuOpen: widget.onMenuOpen,
-        onMenuClose: widget.onMenuClose,
-      );
-    }
-
-    return _LanguageSelectionDropdown(
-      editorState: widget.editorState,
-      language: widget.language,
-      onLanguageSelected: (lang) => widget.onLanguageSelected(lang),
-      supportedLanguages: defaultCodeBlockSupportedLanguages,
-      localizations: widget.localizations,
-      onMenuOpen: widget.onMenuOpen,
-      onMenuClose: widget.onMenuClose,
-    );
-  }
-}
-
-class _LanguageSelectionDropdown extends StatelessWidget {
-  const _LanguageSelectionDropdown({
-    required this.editorState,
-    required this.language,
-    required this.onLanguageSelected,
-    required this.supportedLanguages,
-    required this.localizations,
-    this.onMenuOpen,
-    this.onMenuClose,
-  });
-
-  final EditorState editorState;
-  final String? language;
-  final void Function(String) onLanguageSelected;
-  final List<String> supportedLanguages;
-  final CodeBlockLocalizations localizations;
-  final VoidCallback? onMenuOpen;
-  final VoidCallback? onMenuClose;
+class _DotsWidget extends StatelessWidget {
+  const _DotsWidget();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16),
-      child: DropdownMenu<String>(
-        initialSelection: language ?? 'auto',
-        textStyle: const TextStyle(fontSize: 14),
-        inputDecorationTheme: Theme.of(context).dropdownMenuTheme.inputDecorationTheme ??
-            const InputDecorationTheme(
-              constraints: BoxConstraints(maxWidth: 100),
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(),
-              focusedBorder: UnderlineInputBorder(),
-              errorBorder: UnderlineInputBorder(),
-              focusedErrorBorder: UnderlineInputBorder(),
-            ),
-        menuHeight: 200,
-        onSelected: (value) {
-          if (value != null) {
-            onLanguageSelected(value);
-            onMenuClose?.call();
-          }
-        },
-        dropdownMenuEntries: supportedLanguages
-            .map(
-              (lang) => DropdownMenuEntry<String>(
-                value: lang,
-                label: lang == 'auto' ? localizations.autoLanguage : lang.capitalize(),
-              ),
-            )
-            .toList(),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        _listColorDots.length,
+        (index) => Container(
+          width: 12.0,
+          height: 12.0,
+          margin: const EdgeInsets.only(right: 8),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _listColorDots[index],
+          ),
+        ),
       ),
     );
-  }
-}
-
-extension on String {
-  capitalize() {
-    return '${this[0].toUpperCase()}${substring(1)}';
   }
 }

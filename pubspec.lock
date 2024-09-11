@@ -31,7 +31,7 @@ packages:
     source: hosted
     version: "0.11.3"
   appflowy_editor:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: appflowy_editor
       sha256: "96ad9bdddc7a73d0ad16b69c9670808183cf86bbaed01eb654a6f3e32b6ec507"
@@ -525,6 +525,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "14.2.7"
+  google_fonts:
+    dependency: transitive
+    description:
+      name: google_fonts
+      sha256: b1ac0fe2832c9cc95e5e88b57d627c5e68c223b9657f4b96e1487aa9098c7b82
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.1"
   graphs:
     dependency: transitive
     description:
@@ -533,14 +541,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
-  highlight:
-    dependency: "direct main"
-    description:
-      name: highlight
-      sha256: "5353a83ffe3e3eca7df0abfb72dcf3fa66cc56b953728e7113ad4ad88497cf21"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.0"
   hooks_riverpod:
     dependency: "direct main"
     description:
@@ -613,6 +613,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  irh_editor:
+    dependency: "direct main"
+    description:
+      path: "packages/irh_editor"
+      relative: true
+    source: path
+    version: "0.0.1"
   js:
     dependency: transitive
     description:
@@ -694,7 +701,7 @@ packages:
     source: hosted
     version: "0.1.2-main.4"
   markdown:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: markdown
       sha256: ef2a1298144e3f985cc736b22e0ccdaf188b5b3970648f2d9dc13efd1d9df051
@@ -1154,6 +1161,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  syntax_highlight:
+    dependency: "direct main"
+    description:
+      name: syntax_highlight
+      sha256: ee33b6aa82cc722bb9b40152a792181dee222353b486c0255fde666a3e3a4997
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   term_glyph:
     dependency: transitive
     description:
@@ -1403,5 +1418,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.5.1 <4.0.0"
+  dart: ">=3.5.2 <4.0.0"
   flutter: ">=3.24.0"

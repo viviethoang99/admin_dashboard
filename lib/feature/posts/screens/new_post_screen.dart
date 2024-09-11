@@ -11,13 +11,13 @@ class NewPostScreen extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                TextField(
-                  decoration: const InputDecoration(
+                const TextField(
+                  decoration: InputDecoration(
                     hintText: 'Title',
                   ),
                 ),
-                TextField(
-                  decoration: const InputDecoration(
+                const TextField(
+                  decoration: InputDecoration(
                     hintText: 'Content',
                   ),
                 ),

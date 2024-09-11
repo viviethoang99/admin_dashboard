@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:irh_editor/irh_editor.dart';
 import 'package:irohasu_admin/feature/posts/models/post_model.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 import '../providers/post.dart';
-import 'markdown_editor.dart';
 
 class PostDetailScreen extends ConsumerWidget {
   const PostDetailScreen(this.id, {super.key});
@@ -28,7 +28,7 @@ class PostDetailScreen extends ConsumerWidget {
 
 class _PostSuccess extends ConsumerStatefulWidget {
   const _PostSuccess({super.key, required this.post});
-  final PostModel post;
+  final PostModel? post;
 
   @override
   ConsumerState<_PostSuccess> createState() => _PostSuccessState();
@@ -49,7 +49,7 @@ class _PostSuccessState extends ConsumerState<_PostSuccess> {
     super.initState();
     _stringTagController = StringTagController();
     _stringTagController.addListener(() {
-      ref.read(postNotifierProvider(widget.post.id!).notifier).updateTags(_stringTagController.getTags!);
+      ref.read(postNotifierProvider(widget.post!.id!).notifier).updateTags(_stringTagController.getTags ?? []);
     });
   }
 
@@ -75,8 +75,8 @@ class _PostSuccessState extends ConsumerState<_PostSuccess> {
                 fontSize: 22,
               ),
             ),
-            initialValue: widget.post.title,
-            onChanged: ref.read(postNotifierProvider(widget.post.id!).notifier).updateTitle,
+            initialValue: widget.post?.title,
+            onChanged: (value) {},
           ),
           const SizedBox(height: 20),
           const Text(
@@ -93,7 +93,7 @@ class _PostSuccessState extends ConsumerState<_PostSuccess> {
               Expanded(
                 child: TextFieldTags<String>(
                   textfieldTagsController: _stringTagController,
-                  initialTags: widget.post.tags,
+                  initialTags: widget.post?.tags,
                   textSeparators: const [' ', ','],
                   letterCase: LetterCase.normal,
                   validator: (String tag) {
@@ -195,7 +195,9 @@ class _PostSuccessState extends ConsumerState<_PostSuccess> {
               const SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  ref.read(postNotifierProvider(widget.post.id!).notifier).submit();
+                  if (widget.post?.id != null) {
+                    ref.read(postNotifierProvider(widget.post!.id!).notifier).submit();
+                  }
                 },
                 child: const Text('Lưu'),
               ),
@@ -213,7 +215,7 @@ class _PostSuccessState extends ConsumerState<_PostSuccess> {
               ),
               padding: const EdgeInsets.all(8),
               child: MarkdownEditor(
-                content: widget.post.content ?? '',
+                content: widget.post?.content ?? '',
               ),
             ),
           ),

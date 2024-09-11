@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:syntax_highlight/syntax_highlight.dart';
 
 import 'services/routes.dart';
 import 'services/storage/secure_storage.dart';
 import 'utils/provider_observer.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Highlighter.initialize(['dart']);
 
   runApp(ProviderScope(
     observers: [AppProviderObserver()],
@@ -51,7 +54,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        themeMode: ThemeMode.dark,
+        themeMode: ThemeMode.light,
         routerConfig: router,
       ),
     );

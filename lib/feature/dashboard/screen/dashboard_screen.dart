@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../services/routes.dart';
 import '../../posts/providers/posts.dart';
 
 class DashboardScreen extends HookConsumerWidget {

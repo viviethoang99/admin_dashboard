@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CodeBlockStyle {
+final class CodeBlockStyle {
   CodeBlockStyle({
     required this.backgroundColor,
     required this.foregroundColor,
