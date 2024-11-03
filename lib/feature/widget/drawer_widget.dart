@@ -22,12 +22,12 @@ class IrhDrawer extends StatelessWidget {
                 const _CustomDrawerHeader(),
                 ListTile(
                   leading: const Icon(Icons.create),
-                  title: const Text('Create post'),
+                  title: const Text('Tạo bài viết'),
                   onTap: () {},
                 ),
                 ListTile(
                   leading: const Icon(Icons.article),
-                  title: const Text('Blog Posts'),
+                  title: const Text('Danh sách bài viết'),
                   onTap: () {},
                 ),
                 ListTile(
@@ -45,12 +45,12 @@ class IrhDrawer extends StatelessWidget {
                 const _CustomDrawerHeader(),
                 ListTile(
                   leading: const Icon(Icons.create),
-                  title: const Text('Create post'),
+                  title: const Text('Tạo bài viết'),
                   onTap: () {},
                 ),
                 ListTile(
                   leading: const Icon(Icons.article),
-                  title: const Text('Blog Posts'),
+                  title: const Text('Danh sách bài viết'),
                   onTap: () {},
                 ),
                 ListTile(
@@ -80,8 +80,8 @@ class _CustomDrawerHeader extends StatelessWidget {
         color: Colors.red,
         borderRadius: BorderRadius.circular(0),
       ),
-      child: Row(
-        children: const [
+      child: const Row(
+        children: [
           CircleAvatar(
             radius: 30,
             // backgroundImage: AssetImage('assets/images/irohasu.png'),

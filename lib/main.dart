@@ -51,10 +51,8 @@ class _MyAppState extends ConsumerState<MyApp> {
     return _EagerInitialization(
       child: MaterialApp.router(
         title: 'Irohasu Admin',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        themeMode: ThemeMode.light,
+        darkTheme: ThemeData.dark(),
+        themeMode: ThemeMode.dark,
         routerConfig: router,
       ),
     );

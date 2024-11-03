@@ -6,6 +6,8 @@ import 'package:irohasu_admin/services/auth_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../feature/posts/screens/list_post_tab.dart';
+import '../feature/posts/screens/new_post_screen.dart';
+import '../feature/widget/scaffold_with_navigation.dart';
 
 part 'routes.g.dart';
 
@@ -18,12 +20,15 @@ GoRouter router(RouterRef ref) {
     ..listen(currentAuthStateProvider, (_, state) => authStateNotifier.value = state);
 
   final navigationItems = [
-    GoRoute(
+    NavigationItem(
       path: '/posts',
-      builder: (_, __) => const ListPostTab(),
+      body: (_) => const ListPostTab(),
+      icon: Icons.checklist_outlined,
+      selectedIcon: Icons.checklist,
+      label: 'Todos',
       routes: [
         GoRoute(
-          path: 'create',
+          path: 'add',
           builder: (_, __) => Container(),
         ),
         GoRoute(
@@ -44,6 +49,18 @@ GoRouter router(RouterRef ref) {
         ),
       ],
     ),
+    NavigationItem(
+      path: '/create',
+      body: (_) => const NewPostScreen(),
+      icon: Icons.co_present_outlined,
+      label: 'Create',
+    ),
+    NavigationItem(
+      path: '/profile',
+      body: (_) => const SizedBox.shrink(),
+      icon: Icons.co_present_outlined,
+      label: 'Profile',
+    ),
   ];
 
   final router = GoRouter(
@@ -54,7 +71,23 @@ GoRouter router(RouterRef ref) {
         path: '/login',
         builder: (_, __) => const LoginPage(),
       ),
-      ...navigationItems,
+      ShellRoute(
+        builder: (_, __, child) => child,
+        routes: [
+          for (final (index, item) in navigationItems.indexed)
+            GoRoute(
+              path: item.path,
+              pageBuilder: (context, _) => NoTransitionPage(
+                child: ScaffoldWithNavigation(
+                  selectedIndex: index,
+                  navigationItems: navigationItems,
+                  child: item.body(context),
+                ),
+              ),
+              routes: item.routes,
+            ),
+        ],
+      ),
     ],
     refreshListenable: authStateNotifier,
     redirect: (_, state) {

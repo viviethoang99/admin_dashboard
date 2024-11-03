@@ -11,8 +11,8 @@ class PostModel with _$PostModel {
   const factory PostModel({
     String? id,
     int? status,
-    String? createdAt,
-    String? updatedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     String? title,
     String? description,
     String? content,

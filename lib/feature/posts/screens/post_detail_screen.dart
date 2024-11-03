@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:irh_editor/irh_editor.dart';
 import 'package:irohasu_admin/feature/posts/models/post_model.dart';
-import 'package:textfield_tags/textfield_tags.dart';
 import '../providers/post.dart';
+import 'dialog_save_blog.dart';
 
 class PostDetailScreen extends ConsumerWidget {
   const PostDetailScreen(this.id, {super.key});
@@ -27,7 +27,10 @@ class PostDetailScreen extends ConsumerWidget {
 }
 
 class _PostSuccess extends ConsumerStatefulWidget {
-  const _PostSuccess({super.key, required this.post});
+  const _PostSuccess({
+    super.key,
+    required this.post,
+  });
   final PostModel? post;
 
   @override
@@ -35,30 +38,6 @@ class _PostSuccess extends ConsumerStatefulWidget {
 }
 
 class _PostSuccessState extends ConsumerState<_PostSuccess> {
-  late StringTagController _stringTagController;
-  late double _distanceToField;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _distanceToField = MediaQuery.of(context).size.width;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _stringTagController = StringTagController();
-    _stringTagController.addListener(() {
-      ref.read(postNotifierProvider(widget.post!.id!).notifier).updateTags(_stringTagController.getTags ?? []);
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _stringTagController.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -67,148 +46,69 @@ class _PostSuccessState extends ConsumerState<_PostSuccess> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextFormField(
-            decoration: const InputDecoration(
+            initialValue: widget.post?.title,
+            decoration: InputDecoration(
               labelText: 'Tiêu đề',
-              labelStyle: TextStyle(
-                color: Colors.black,
+              labelStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
               ),
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Color.fromARGB(255, 74, 137, 92),
+                  width: 2.0,
+                ),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Color.fromARGB(255, 74, 137, 92),
+                  width: 2.0,
+                ),
+              ),
+              suffixIcon: Container(
+                constraints: const BoxConstraints(
+                  maxHeight: 48,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.image),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.link),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return DialogSaveBlog(
+                              tags: widget.post?.tags ?? [],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
-            initialValue: widget.post?.title,
             onChanged: (value) {},
           ),
           const SizedBox(height: 20),
           const Text(
             'Thể loại',
             style: TextStyle(
-              color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 15,
             ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: TextFieldTags<String>(
-                  textfieldTagsController: _stringTagController,
-                  initialTags: widget.post?.tags,
-                  textSeparators: const [' ', ','],
-                  letterCase: LetterCase.normal,
-                  validator: (String tag) {
-                    if (_stringTagController.getTags!.contains(tag)) {
-                      return 'You\'ve already entered that';
-                    }
-
-                    return null;
-                  },
-                  inputFieldBuilder: (context, inputFieldValues) {
-                    return TextField(
-                      onTap: () {
-                        _stringTagController.getFocusNode?.requestFocus();
-                      },
-                      controller: inputFieldValues.textEditingController,
-                      focusNode: inputFieldValues.focusNode,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        border: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(255, 74, 137, 92),
-                            width: 3.0,
-                          ),
-                        ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(255, 74, 137, 92),
-                            width: 3.0,
-                          ),
-                        ),
-                        helperText: 'Enter language...',
-                        helperStyle: const TextStyle(
-                          color: Color.fromARGB(255, 74, 137, 92),
-                        ),
-                        hintText: inputFieldValues.tags.isNotEmpty ? '' : "Enter tag...",
-                        errorText: inputFieldValues.error,
-                        prefixIconConstraints: BoxConstraints(maxWidth: _distanceToField * 0.8),
-                        prefixIcon: inputFieldValues.tags.isNotEmpty
-                            ? SingleChildScrollView(
-                                controller: inputFieldValues.tagScrollController,
-                                scrollDirection: Axis.vertical,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8,
-                                    bottom: 8,
-                                    left: 8,
-                                  ),
-                                  child: Wrap(
-                                      runSpacing: 4.0,
-                                      spacing: 4.0,
-                                      children: inputFieldValues.tags.map((String tag) {
-                                        return Container(
-                                          decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(20.0),
-                                            ),
-                                            color: Color.fromARGB(255, 74, 137, 92),
-                                          ),
-                                          margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                                          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              InkWell(
-                                                child: Text(
-                                                  tag,
-                                                  style: const TextStyle(color: Colors.white),
-                                                ),
-                                                onTap: () {
-                                                  //print("$tag selected");
-                                                },
-                                              ),
-                                              const SizedBox(width: 4.0),
-                                              InkWell(
-                                                child: const Icon(
-                                                  Icons.cancel,
-                                                  size: 14.0,
-                                                  color: Color.fromARGB(255, 233, 233, 233),
-                                                ),
-                                                onTap: () {
-                                                  inputFieldValues.onTagRemoved(tag);
-                                                },
-                                              )
-                                            ],
-                                          ),
-                                        );
-                                      }).toList()),
-                                ),
-                              )
-                            : null,
-                      ),
-                      onChanged: inputFieldValues.onTagChanged,
-                      onSubmitted: inputFieldValues.onTagSubmitted,
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (widget.post?.id != null) {
-                    ref.read(postNotifierProvider(widget.post!.id!).notifier).submit();
-                  }
-                },
-                child: const Text('Lưu'),
-              ),
-            ],
           ),
           const SizedBox(height: 20),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Colors.black,
+                  color: Colors.white,
                   width: 1,
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -219,6 +119,50 @@ class _PostSuccessState extends ConsumerState<_PostSuccess> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChipWidget extends StatelessWidget {
+  const _ChipWidget({
+    super.key,
+    required this.tag,
+    required this.onTagRemoved,
+  });
+
+  final String tag;
+  final Function(String tag) onTagRemoved;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(20.0),
+        ),
+        color: Color.fromARGB(255, 74, 137, 92),
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            tag,
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(width: 4.0),
+          InkWell(
+            child: const Icon(
+              Icons.cancel,
+              size: 14.0,
+              color: Color.fromARGB(255, 233, 233, 233),
+            ),
+            onTap: () => onTagRemoved(tag),
+          )
         ],
       ),
     );
