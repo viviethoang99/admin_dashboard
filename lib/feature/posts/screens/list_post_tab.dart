@@ -35,7 +35,7 @@ class ListPostTab extends HookConsumerWidget {
                   final post = articles[index];
                   return DataRow(
                     onSelectChanged: (value) {
-                      context.go('/create');
+                      context.go('/posts/${post.id}');
                     },
                     cells: [
                       DataCell(Text('${index + 1}')),

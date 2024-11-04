@@ -155,7 +155,6 @@ class _DialogSaveBlogState extends State<DialogSaveBlog> {
 
 class _ContentWidget extends StatelessWidget {
   const _ContentWidget({
-    super.key,
     required this.label,
     required this.child,
   });

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:irohasu_admin/feature/tags/model/tag_model.dart';
 import 'package:irohasu_admin/services/api/api_result.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:retrofit/retrofit.dart';
@@ -37,4 +38,7 @@ abstract class ApiClient {
 
   @GET('/api/posts/{id}')
   Future<ApiResult<PostModel>> fetchPost(@Path('id') String id);
+
+  @GET('/api/tags?limit=20')
+  Future<ApiResult<List<TagModel>>> fetchTags();
 }

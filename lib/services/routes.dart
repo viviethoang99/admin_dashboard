@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:irohasu_admin/feature/login/screen/login_page.dart';
 import 'package:irohasu_admin/feature/posts/screens/post_detail_screen.dart';
+import 'package:irohasu_admin/feature/tags/screen/list_tag_screen.dart';
 import 'package:irohasu_admin/services/auth_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -60,6 +61,12 @@ GoRouter router(RouterRef ref) {
       body: (_) => const SizedBox.shrink(),
       icon: Icons.co_present_outlined,
       label: 'Profile',
+    ),
+    NavigationItem(
+      path: '/tags',
+      body: (_) => const ListTagTab(),
+      icon: Icons.abc_rounded,
+      label: 'Thể loại',
     ),
   ];
 

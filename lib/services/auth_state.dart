@@ -54,7 +54,7 @@ enum AuthState {
     allowedPaths: [
       '/posts',
       '/posts/:id',
-      '/todos',
+      '/tags',
       '/create',
       '/profile',
       '/settings',

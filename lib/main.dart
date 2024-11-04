@@ -52,7 +52,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       child: MaterialApp.router(
         title: 'Irohasu Admin',
         darkTheme: ThemeData.dark(),
-        themeMode: ThemeMode.dark,
+        themeMode: ThemeMode.light,
         routerConfig: router,
       ),
     );
